@@ -13,6 +13,9 @@ let package = Package(
         // The reusable guts. The menu bar app and the CLI harness both link this.
         .target(name: "OrigamiKit"),
 
+        // The menu bar app: intercepts Cmd+Q and runs the swap.
+        .executableTarget(name: "OrigamiClose", dependencies: ["OrigamiKit"]),
+
         // A terminal harness: find the frontmost window, capture it, report timings.
         .executableTarget(name: "origami-capture", dependencies: ["OrigamiKit"]),
 
