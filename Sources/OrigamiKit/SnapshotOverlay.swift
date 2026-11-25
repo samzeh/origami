@@ -35,6 +35,9 @@ public final class SnapshotOverlay {
 
     public var isVisible: Bool { panel.isVisible }
 
+    /// Wash the snapshot red when shown, so the swap is visible while developing.
+    public var debugTint = false
+
     private var fadeTimer: Timer?
 
     public init() {
@@ -143,5 +146,15 @@ public final class SnapshotOverlay {
     public func dismiss() {
         panel.orderOut(nil)
         panel.alphaValue = 1
+    }
+}
+
+extension SnapshotOverlay: OverlayPresenting {
+    public func show(_ snapshot: WindowSnapshot, mainDisplayHeight: CGFloat) {
+        show(snapshot, mainDisplayHeight: mainDisplayHeight, tinted: debugTint)
+    }
+
+    public func fadeOut(duration: TimeInterval) {
+        fadeOut(duration: duration) {}
     }
 }
