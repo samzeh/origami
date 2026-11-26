@@ -57,6 +57,18 @@ arguments.removeAll { $0 == "--reveal" }
 let tinted = arguments.contains("--tint")
 arguments.removeAll { $0 == "--tint" }
 
+// --fold [seconds]: spike the paper fold instead of a plain overlay.
+var foldHold: Double? = nil
+if let index = arguments.firstIndex(of: "--fold") {
+    arguments.remove(at: index)
+    if index < arguments.count, let seconds = Double(arguments[index]) {
+        foldHold = seconds
+        arguments.remove(at: index)
+    } else {
+        foldHold = 6
+    }
+}
+
 // --overlay [seconds]: after capturing, lay the snapshot back over the screen.
 var overlayHold: Double? = nil
 if let index = arguments.firstIndex(of: "--overlay") {
@@ -284,6 +296,19 @@ if reveal {
 }
 
 // MARK: - Overlay
+
+if let foldHold {
+    let panel = await MainActor.run {
+        FoldSpike.run(snapshot: snapshot, mainDisplayHeight: mainHeight, duration: 1.2)
+    }
+    print("")
+    print("FOLD SPIKE  (\(String(format: "%.0f", foldHold))s) — right half folds onto the left")
+    Timer.scheduledTimer(withTimeInterval: foldHold, repeats: false) { _ in
+        MainActor.assumeIsolated { panel.orderOut(nil) }
+        exit(0)
+    }
+    application.run()
+}
 
 guard let hold = overlayHold else {
     if !reveal {
